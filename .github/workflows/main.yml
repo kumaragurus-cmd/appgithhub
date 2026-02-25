@@ -1,0 +1,39 @@
+name: Multi-Environment CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Run tests
+        run: echo "Running tests..."
+
+  deploy-dev:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: Dev
+    steps:
+      - name: Deploy to Dev
+        run: echo "Deploying to Dev environment"
+
+  deploy-staging:
+    needs: deploy-dev
+    runs-on: ubuntu-latest
+    environment: QA
+    steps:
+      - name: Deploy to Staging
+        run: echo "Deploying to Staging environment"
+
+  deploy-prod:
+    needs: deploy-staging
+    runs-on: ubuntu-latest
+    environment: Prod
+    steps:
+      - name: Deploy to Production
+        run: echo "Deploying to Production environment"
