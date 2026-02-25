@@ -1,0 +1,58 @@
+name: Databricks Asset Bundle Deployment
+
+on:
+  push:
+    branches:
+      - main
+      - 'feature/*'
+  workflow_dispatch:
+
+jobs:
+  deploy-dev:
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install Databricks CLI
+        run: pip install databricks-cli
+
+      - name: Deploy Bundle to Dev
+        run: |
+          databricks bundle deploy --environment dev
+        env:
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST_DEV }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN_DEV }}
+
+  deploy-staging:
+    needs: deploy-dev
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install Databricks CLI
+        run: pip install databricks-cli
+      - name: Deploy Bundle to Staging
+        run: |
+          databricks bundle deploy --environment staging
+        env:
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST_STAGING }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN_STAGING }}
+
+  deploy-prod:
+    needs: deploy-staging
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install Databricks CLI
+        run: pip install databricks-cli
+      - name: Deploy Bundle to Prod
+        run: |
+          databricks bundle deploy --environment prod
+        env:
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST_PROD }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN_PROD }}
