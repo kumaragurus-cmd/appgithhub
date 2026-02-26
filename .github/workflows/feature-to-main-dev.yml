@@ -1,0 +1,52 @@
+name: Promote Feature to Main and Deploy to Dev
+
+on:
+  push:
+    branches:
+      - 'feature/*'   # Trigger when code is pushed to any feature branch
+  workflow_dispatch:
+
+jobs:
+  merge-to-main:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Fetch all branches
+        run: git fetch origin
+
+      - name: Checkout main branch
+        run: git checkout main
+
+      - name: Merge Feature into Main
+        run: |
+          git merge ${{ github.ref_name }} --no-edit
+          git push origin main
+
+  deploy-dev:
+    needs: merge-to-main
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install Databricks CLI
+        run: pip install databricks-cli
+
+      - name: Configure Databricks CLI
+        run: |
+          databricks configure --token <<EOF
+          ${{ secrets.DATABRICKS_HOST_DEV }}
+          ${{ secrets.DATABRICKS_TOKEN_DEV }}
+          EOF
+
+      - name: Upload Notebooks to Dev Workspace
+        run: |
+          databricks workspace import_dir notebooks /Repos/dev-notebooks --overwrite
