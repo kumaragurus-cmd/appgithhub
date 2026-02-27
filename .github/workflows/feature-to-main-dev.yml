@@ -16,11 +16,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Configure Git
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
       - name: Fetch all branches
         run: git fetch origin
 
@@ -30,4 +25,4 @@ jobs:
       - name: Merge Feature into Main
         run: |
         git merge ${{ github.ref_name }} --no-edit --allow-unrelated-histories
-        git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/kumaragurus-cmd/appgithhub.git main
+        git push https://x-access-token:${{ secrets.GIT }}@github.com/kumaragurus-cmd/appgithhub.git main
