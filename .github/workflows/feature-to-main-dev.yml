@@ -29,5 +29,5 @@ jobs:
 
       - name: Merge Feature into Main
         run: |
-    git merge ${{ github.ref_name }} --no-edit --allow-unrelated-histories
-    git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/kumaragurus-cmd/appgithhub.git main
+        git merge ${{ github.ref_name }} --no-edit --allow-unrelated-histories
+        git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/kumaragurus-cmd/appgithhub.git main
